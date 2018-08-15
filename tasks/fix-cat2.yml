@@ -386,6 +386,20 @@
             - "system-auth"
             - "password-auth"
 
+      - name: |
+              "MEDIUM | RHEL-07-010320 | PATCH | Accounts subject to three unsuccessful login attempts within 15 minutes must be locked for the maximum configurable period (update preauth)."
+              "MEDIUM | RHEL-07-010330 | PATCH | If three unsuccessful logon attempts within 15 minutes occur the associated account must be locked (update preauth)."
+        pamd:
+            name: "{{ item }}"
+            state: updated
+            type: auth
+            control: required
+            module_path: pam_faillock.so
+            module_arguments: "preauth silent audit deny={{ rhel7stig_pam_faillock.attempts }}{{ (rhel7stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel7stig_pam_faillock.interval }} unlock_time={{ rhel7stig_pam_faillock.unlock_time }}"
+        with_items:
+            - "system-auth"
+            - "password-auth"
+
       - name: "MEDIUM | RHEL-07-010330 | PATCH | If three unsuccessful logon attempts within 15 minutes occur the associated account must be locked."
         pamd:
             name: "{{ item }}"
@@ -396,6 +410,18 @@
             new_type: auth
             new_control: "[default=die]"
             new_module_path: pam_faillock.so
+            module_arguments: "authfail audit deny={{ rhel7stig_pam_faillock.attempts }}{{ (rhel7stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel7stig_pam_faillock.interval }} unlock_time={{ rhel7stig_pam_faillock.unlock_time }}"
+        with_items:
+            - "system-auth"
+            - "password-auth"
+
+      - name: "MEDIUM | RHEL-07-010330 | PATCH | If three unsuccessful logon attempts within 15 minutes occur the associated account must be locked (update authfail)."
+        pamd:
+            name: "{{ item }}"
+            state: updated
+            type: auth
+            control: "[default=die]"
+            module_path: pam_faillock.so
             module_arguments: "authfail audit deny={{ rhel7stig_pam_faillock.attempts }}{{ (rhel7stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel7stig_pam_faillock.interval }} unlock_time={{ rhel7stig_pam_faillock.unlock_time }}"
         with_items:
             - "system-auth"
